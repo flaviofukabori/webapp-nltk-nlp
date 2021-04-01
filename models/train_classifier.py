@@ -1,24 +1,80 @@
-import sys
+import nltk
+nltk.download(['punkt', 'wordnet', 'averaged_perceptron_tagger'])
 
+# import libraries
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
+
+
+import joblib
+import pandas as pd
+from sqlalchemy import create_engine
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+from sklearn.metrics import classification_report
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.multioutput import MultiOutputClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.pipeline import Pipeline
+import sys
+from tempfile import mkdtemp
 
 def load_data(database_filepath):
-    pass
+    
+    engine = create_engine(f'sqlite:///{database_filepath}')
+    df = pd.read_sql_table(table_name='disaster_messages', con=engine)
+    
+    category_names = set(df.columns.tolist()) - set(['id','message','original','genre'])
+
+    X = df['message'].values
+    Y = df[category_names].values
+    
+    return X, Y, category_names 
 
 
 def tokenize(text):
-    pass
+    tokens = word_tokenize(text)
+    lemmatizer = WordNetLemmatizer()
+
+    clean_tokens = []
+    for tok in tokens:
+        clean_tok = lemmatizer.lemmatize(tok).lower().strip()
+        clean_tokens.append(clean_tok)
+
+    return clean_tokens
 
 
 def build_model():
-    pass
+    pipeline = Pipeline([
+        ('vect', CountVectorizer(tokenizer=tokenize)),
+        ('tfidf', TfidfTransformer()),
+        ('clf', MultiOutputClassifier(RandomForestClassifier(n_jobs=-2)))
+    ])
+
+    #parameters selected after grid search
+    best_params = { 
+                    'vect__max_df': 0.5,
+                    'vect__ngram_range': (1, 1),
+                    'tfidf__use_idf': True,
+                    'clf__estimator__min_samples_split': 2,
+                    'clf__estimator__n_estimators': 50,
+                  }
+
+    pipeline.set_params(**best_params)
+
+    return pipeline 
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
-    pass
+    preds = model.predict(X_test)
+
+    for idx, category in enumerate(category_names):
+        print(f'results for {category}: \n', 
+            classification_report(Y_test[idx], preds[idx]))
 
 
 def save_model(model, model_filepath):
-    pass
+    joblib.dump(model, model_filepath)
 
 
 def main():
