@@ -3,6 +3,16 @@ from sqlalchemy import create_engine
 import sys
 
 def load_data(messages_filepath, categories_filepath):
+    """ Load messages and message categories from csv files to pandas 
+    Dataframe
+
+    Arguments:
+    messages_filepath (string): Path of messages
+    categories_filepath (string): Path of categories
+
+    Returns:
+    df (dataframe): A dataframe after merging the csv files
+    """
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
 
@@ -13,6 +23,16 @@ def load_data(messages_filepath, categories_filepath):
 
 
 def clean_data(df):
+    """ Apply data cleaning steps to raw data
+
+
+    Arguments:
+    df (dataframe): The dataframe to be cleaned
+
+    Returns:
+    df (dataframe): Cleaned dataframe
+    """
+
     # create a dataframe of the 36 individual category columns
     categories = df['categories'].str.split(pat=';', expand=True)
     
@@ -43,6 +63,13 @@ def clean_data(df):
 
 
 def save_data(df, database_filename):
+    """ Persisst dataframe object to sqlite datafile
+
+    Arguments:
+    df (dataframe):
+    datbase_filename (string): Path to persist the sqllite dafile
+
+    """
     engine = create_engine(f'sqlite:///{database_filename}')
     df.to_sql('disaster_messages', engine, index=False, if_exists='replace')
 

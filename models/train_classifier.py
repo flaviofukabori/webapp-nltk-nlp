@@ -20,6 +20,16 @@ import sys
 from tempfile import mkdtemp
 
 def load_data(database_filepath):
+    """ Load data stored on sqlite database
+
+    Arguments:
+    database_filepath (string): Path to sqlite database filename
+
+    Returns:
+    X (array): The string messages mx1 to feed the model 
+    Y (array): The labels of the model (mx36)
+    category_names (list): List of strings with the name of the 36 categories
+    """
     
     engine = create_engine(f'sqlite:///{database_filepath}')
     df = pd.read_sql_table(table_name='disaster_messages', con=engine)
@@ -33,6 +43,14 @@ def load_data(database_filepath):
 
 
 def tokenize(text):
+    """ Converts a text sentence to a list of tokens using nltk libraries
+
+    Arguments:
+    text (string): The sentence to be tokenized
+
+    Returns:
+    clean_tokens (list): A list of string tokens after applying nltk libraries
+    """
     tokens = word_tokenize(text)
     lemmatizer = WordNetLemmatizer()
 
@@ -45,6 +63,12 @@ def tokenize(text):
 
 
 def build_model():
+    """ Build the model structure (Pipeline) to used to train fit
+    and predict
+
+    Returns:
+    pipeline:  A scikit-learn Pipeline
+    """
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
@@ -66,6 +90,15 @@ def build_model():
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    """ Make the prediction based on input and outputs model metrics
+    for each category
+
+    Arguments:
+    model: Model used to evaluate metrics
+    X_test: The input features to the model
+    Y_test: The true labels
+    category_names: The name of categories
+    """
     preds = model.predict(X_test)
 
     for idx, category in enumerate(category_names):
@@ -74,10 +107,19 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 
 def save_model(model, model_filepath):
+    """ Save the given model to the especified path """
+
     joblib.dump(model, model_filepath)
 
 
 def main():
+    """ Run the full training Pipeline
+    Load training data
+    Build the model
+    Train the model model
+    Evalute model metrics
+    Save the trained model
+    """
     if len(sys.argv) == 3:
         database_filepath, model_filepath = sys.argv[1:]
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
