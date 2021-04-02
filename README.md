@@ -62,7 +62,7 @@ using a machine learning model.
 
 ## Demo <a name="demo"></a>
 
-A demo of this web application hosted on Heroku is available [here](https://flask-plotly-accommodation.herokuapp.com/).
+TODO: A demo is not available yet. Once available link will be **here**
 
 ## Licensing, Authors, Acknowledgements<a name="licensing"></a>
 
