@@ -69,13 +69,14 @@ def build_model():
     Returns:
     pipeline:  A scikit-learn Pipeline
     """
+
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
         ('clf', MultiOutputClassifier(RandomForestClassifier(n_jobs=-2)))
     ])
 
-    #parameters selected after grid search
+    # Best parameters search was done on ML_Pipeline_Preparation.ipynb
     best_params = { 
                     'vect__max_df': 0.5,
                     'vect__ngram_range': (1, 1),
@@ -114,6 +115,7 @@ def save_model(model, model_filepath):
 
 def main():
     """ Run the full training Pipeline
+    
     Load training data
     Build the model
     Train the model model

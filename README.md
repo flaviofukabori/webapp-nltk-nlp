@@ -43,12 +43,12 @@ The main goal of this project is to build a end-to-end machine learning applicat
 
 **Technical details*:
 The project is built in Python and use some libraries like pandas, scikit-learn, nltk, flask, plotly, sqlalchemy.
-
+For text message encoding, CountVectorizer and TF-IDF are used.
 
 ## File Descriptions <a name="files"></a>
 
 **notebook** folder contains 2 notebooks which are used to prototype the 
-etl pipeline and  machine learning pipeline. 
+etl pipeline and machine learning pipeline. 
 
 **data** folder contains python scripts to process the etl pipeline 
 and sample raw data

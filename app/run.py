@@ -38,34 +38,64 @@ model = joblib.load("../models/classifier.pkl")
 @app.route('/index')
 def index():
     
+
+    graphs = []
+
     # extract data needed for visuals
     # TODO: Below is an example - modify to extract data for your own visuals
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
-    
+
+
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
-    graphs = [
-        {
-            'data': [
-                Bar(
-                    x=genre_names,
-                    y=genre_counts.tolist()
-                )
-            ],
+    graph1 = {
+        'data': [
+            Bar(
+                x=genre_names,
+                y=genre_counts.tolist()
+            )
+        ],
 
-            'layout': {
-                'title': 'Distribution of Message Genres',
-                'yaxis': {
-                    'title': "Count"
-                },
-                'xaxis': {
-                    'title': "Genre"
-                }
+        'layout': {
+            'title': 'Distribution of Message Genres',
+            'yaxis': {
+                'title': "Count"
+            },
+            'xaxis': {
+                'title': "Genre"
             }
         }
-    ]
+    }
+
+    # message count by category
+    category_list = list(set(df.columns.tolist()) - set(['id','message','original','genre']))
+    messages_by_category = df[category_list].sum().sort_values()
+    category_names = messages_by_category.index.tolist()
+    category_counts = messages_by_category.values.tolist()    
     
+    graph2 = {
+        'data': [
+            Bar(
+                x=category_names,
+                y=category_counts
+            )
+        ],
+
+        'layout': {
+            'title': 'Distribution of Message Categories',
+            'yaxis': {
+                'title': "Count"
+            },
+            'xaxis': {
+                'title': "Category"
+            }
+        }
+    }
+
+    graphs.append(graph1)
+    graphs.append(graph2)
+
     # encode plotly graphs in JSON
     ids = ["graph-{}".format(i) for i, _ in enumerate(graphs)]
     graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
